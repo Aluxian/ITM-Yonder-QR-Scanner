@@ -1,0 +1,235 @@
+<br>
+
+<div class="container">
+  <nav class="panel navbar navbar-default">
+
+    <div class="navbar-header">
+      <button class="navbar-toggle" data-target=".navbar-inverse-collapse"
+        data-toggle="collapse" type="button">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/dashboard">Handout</a>
+    </div>
+    <div class="navbar-collapse collapse navbar-inverse-collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#gifts" aria-controls="gifts" role="tab" data-toggle="tab">Sent Gifts</a></li>
+        <li><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab">My Templates</a></li>
+        <li><a href="#newGift" aria-controls="newGift" role="tab" data-toggle="tab" ng-click="emptyNewGift()">Hand out a gift</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-target="#" data-toggle="dropdown"
+            href="bootstrap-elements.html"><%- user.username %>
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="/logout">Log out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+  </nav>
+</div>
+
+<div class="container">
+  <div class="panel" ng-controller='DashboardController' role="tabpanel">
+
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="gifts">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Sent To</th>
+              <th>Template</th>
+              <th>Opened</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="gift in gifts">
+              <td ng-bind="gift.name"></td>
+              <td ng-bind="gift.receiver"></td>
+              <td ng-bind="gift.template.label"></td>
+              <td ng-bind="gift.opened"></td>
+              <td>
+                <a href="#" ng-click="removeGift(gift.id)">Remove</a>
+                <a ng-href="/gift/{{gift.id}}" target="_blank">View</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="templates">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Syntax</th>
+              <th>Source</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="template in templates">
+              <td ng-bind="template.label"></td>
+              <td ng-bind="template.syntax"></td>
+              <td ng-bind="template.source"></td>
+              <td>
+                <!-- <a href="#">Edit</a> -->
+                <a href ng-click="removeTemplate(template.id)">Remove</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <a href="#newTemplate" aria-controls="newTemplate" role="tab" data-toggle="tab" class="pull-right btn btn-primary">Create Template</a>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="newTemplate">
+        <form class="container-fluid form-horizontal">
+          <br>
+          <fieldset>
+            <legend>Create a new template</legend>
+            <div class="form-group">
+              <label for="inputLabel" class="col-lg-2 control-label">Label</label>
+              <div class="col-lg-10">
+                <input type="text" class="form-control" id="inputLabel" placeholder="Label" name="label" required ng-model="templ.label">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label">Syntax</label>
+              <div class="col-lg-10">
+                <div class="radio radio-primary">
+                  <label>
+                    <input type="radio" name="syntax" id="optionsRadios1" ng-model="templ.syntax" value="html" required checked="">
+                    <span class="circle"></span>
+                    <span class="check"></span> HTML </label>
+                </div>
+                <div class="radio radio-primary">
+                  <label>
+                    <input type="radio" name="syntax" id="optionsRadios2" ng-model="templ.syntax" required value="markdown">
+                    <span class="circle"></span>
+                    <span class="check"></span> Markdown </label>
+                </div>
+                <div class="radio radio-primary">
+                  <label>
+                    <input type="radio" name="syntax" id="optionsRadios2" ng-model="templ.syntax" required value="haml">
+                    <span class="circle"></span>
+                    <span class="check"></span> HAML </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="textArea" class="col-lg-2 control-label">Source</label>
+              <div class="col-lg-10">
+                <textarea class="form-control" rows="3" id="textArea" required ng-model="templ.source"></textarea>
+
+                <p>Use variables 'receiverName' and 'reward'</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-lg-10 col-lg-offset-2">
+                <a ng-click="emptyForm()" class="btn btn-default" href="#templates" aria-controls="templates" role="tab" data-toggle="tab">Cancel</a>
+                <a ng-click="submitNewTemplate()" class="btn btn-primary" href="#templates" aria-controls="templates" role="tab" data-toggle="tab">Submit</a>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="newGift" style="position: relative;">
+      <div class="big-notification bg-success" ng-show="showSuccessNotification">
+        <div class="content">
+          <span>SUCCESS !</span>
+        </div>
+      </div>
+
+      <div class="big-notification bg-danger" ng-show="showFailedNotification">
+        <div class="content">
+          <span>FAILED !</span>
+        </div>
+      </div>
+
+      <form class="container-fluid form-horizontal">
+        <br>
+        <fieldset>
+          <legend>Hand out a gift</legend>
+
+          <div class="form-group">
+            <label class="col-lg-2 control-label">Name</label>
+
+            <div class="col-lg-10">
+              <input class="form-control" type="text" placeholder="Name" ng-model="newGift.name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-lg-2 control-label">Owner</label>
+
+            <div class="col-lg-10">
+              <input class="form-control" type="text" placeholder="Owner" value="{{ user.username }}" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-lg-2 control-label">Template</label>
+
+            <div class="col-lg-10">
+              <select class="form-control" ng-model="newGift.template">
+                <option ng-repeat="template in templates" value="{{ template.id }}" ng-bind="template.label"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-lg-12">
+            <button class="btn btn-info pull-right" ng-click="addReceiverToNewGift()">
+              Add receiver
+            </button>
+          </div>
+
+          <div ng-repeat="receiver in newGift.receivers">
+            <div class="form-group">
+              <label class="col-lg-2 control-label">Receiver name #{{ $index }}</label>
+
+              <div class="col-lg-10">
+                <input class="form-control" type="text" placeholder="Receiver" ng-model="receiver.name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-lg-2 control-label">Reward</label>
+
+              <div class="col-lg-10">
+                <input class="form-control" type="text" placeholder="Reward" ng-model="receiver.reward">
+              </div>
+            </div>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <div class="col-lg-12">
+            <div class="pull-right">
+              <button class="btn btn-success" ng-click="downloadQRs(newGift)">
+                <div class="icon-preview"><i class="mdi-file-file-download"></i></div>
+
+                <span>Download QRs</span>
+              </button>
+            </div>
+          </div>
+          <div>
+      </div>
+
+        </fieldset>
+
+      </form>
+
+      </div> <!-- /#newGift -->
+    </div>
+
+  </div>
+</div>
